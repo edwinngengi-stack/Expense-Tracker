@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Expense Tracker</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3Cpath d='M8 21l5-5 4 4 7-9' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900 antialiased dark:bg-slate-900 dark:text-slate-100">
+
+  <!-- Sign in / create account -->
+  <section id="auth-view" class="hidden">
+    <div class="mx-auto flex min-h-screen max-w-md flex-col justify-center px-4 py-10">
+      <div class="mb-6 text-center">
+        <div class="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-xl bg-indigo-600 text-white">
+          <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 17l5-5 4 4 7-9"/></svg>
+        </div>
+        <h1 class="text-2xl font-bold">Expense Tracker</h1>
+        <p class="mt-1 text-slate-600 dark:text-slate-400">Keep track of your income and spending.</p>
+      </div>
+
+      <div class="card p-6">
+        <div class="mb-5 grid grid-cols-2 gap-1 rounded-lg bg-slate-100 p-1 dark:bg-slate-900">
+          <button id="tab-login" type="button" class="rounded-md px-3 py-2 text-sm font-semibold">Sign in</button>
+          <button id="tab-register" type="button" class="rounded-md px-3 py-2 text-sm font-semibold">Create account</button>
+        </div>
+
+        <form id="auth-form" novalidate>
+          <div id="name-field" class="mb-3 hidden">
+            <label class="label" for="auth-name">Name</label>
+            <input id="auth-name" class="field" type="text" autocomplete="name" maxlength="80">
+            <p id="auth-name-error" class="field-error"></p>
+          </div>
+          <div class="mb-3">
+            <label class="label" for="auth-email">Email</label>
+            <input id="auth-email" class="field" type="email" autocomplete="email" maxlength="254">
+            <p id="auth-email-error" class="field-error"></p>
+          </div>
+          <div class="mb-3">
+            <label class="label" for="auth-password">Password</label>
+            <input id="auth-password" class="field" type="password" autocomplete="current-password" maxlength="200">
+            <p id="auth-password-error" class="field-error"></p>
+          </div>
+          <p id="auth-form-error" class="field-error font-semibold" role="alert"></p>
+          <button id="auth-submit" type="submit" class="btn btn-primary w-full py-2.5">Sign in</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dashboard -->
+  <section id="app-view" class="hidden">
+    <header class="border-b border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
+      <div class="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
+        <div class="flex items-center gap-3">
+          <div class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 17l5-5 4 4 7-9"/></svg>
+          </div>
+          <span class="text-lg font-bold">Expense Tracker</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span id="user-name" class="hidden max-w-[12rem] truncate text-sm text-slate-600 sm:inline dark:text-slate-300"></span>
+          <button id="logout-btn" type="button" class="btn btn-sm">Log out</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-6xl px-4 py-6">
+      <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <button id="prev-month" type="button" class="btn btn-sm" aria-label="Previous month">&lsaquo;</button>
+          <h2 id="month-label" class="min-w-[9.5rem] text-center text-lg font-semibold"></h2>
+          <button id="next-month" type="button" class="btn btn-sm" aria-label="Next month">&rsaquo;</button>
+          <button id="this-month" type="button" class="btn btn-sm">This month</button>
+        </div>
+        <button id="add-btn" type="button" class="btn btn-primary">+ Add transaction</button>
+      </div>
+
+      <!-- Totals -->
+      <div class="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+        <div class="card p-4 sm:p-5">
+          <p class="text-sm text-slate-500 dark:text-slate-400">Income</p>
+          <p id="stat-income" class="mt-1 text-lg font-bold sm:text-2xl text-emerald-600 dark:text-emerald-400">&nbsp;</p>
+        </div>
+        <div class="card p-4 sm:p-5">
+          <p class="text-sm text-slate-500 dark:text-slate-400">Expenses</p>
+          <p id="stat-expense" class="mt-1 text-lg font-bold sm:text-2xl text-rose-600 dark:text-rose-400">&nbsp;</p>
+        </div>
+        <div class="card col-span-2 p-4 sm:col-span-1 sm:p-5">
+          <p class="text-sm text-slate-500 dark:text-slate-400">Balance</p>
+          <p id="stat-balance" class="mt-1 text-lg font-bold sm:text-2xl">&nbsp;</p>
+        </div>
+      </div>
+
+      <!-- Reports -->
+      <div class="mb-5 grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <section class="card p-5" aria-labelledby="cat-title">
+          <h3 id="cat-title" class="mb-4 font-semibold">Spending by category</h3>
+          <div id="category-chart"></div>
+        </section>
+
+        <section class="card p-5" aria-labelledby="trend-title">
+          <div class="mb-4 flex items-center justify-between gap-3">
+            <h3 id="trend-title" class="font-semibold">Last 6 months</h3>
+            <div class="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+              <span class="flex items-center gap-1"><span class="h-2.5 w-2.5 rounded-sm bg-emerald-500"></span>Income</span>
+              <span class="flex items-center gap-1"><span class="h-2.5 w-2.5 rounded-sm bg-rose-500"></span>Expenses</span>
+            </div>
+          </div>
+          <div id="trend-chart"></div>
+        </section>
+      </div>
+
+      <!-- Transactions -->
+      <section class="card" aria-labelledby="tx-heading">
+        <div class="flex flex-wrap items-center gap-3 border-b border-slate-200 p-4 dark:border-slate-700">
+          <h3 id="tx-heading" class="mr-auto font-semibold">Transactions</h3>
+          <label class="sr-only" for="filter-search">Search transactions</label>
+          <input id="filter-search" class="field w-full sm:w-56" type="search" placeholder="Search note or category">
+          <label class="sr-only" for="filter-type">Filter by type</label>
+          <select id="filter-type" class="field w-full sm:w-36">
+            <option value="">All types</option>
+            <option value="income">Income</option>
+            <option value="expense">Expenses</option>
+          </select>
+          <a id="export-link" class="btn btn-sm" href="/api/transactions/export.csv" download>Export CSV</a>
+        </div>
+        <ul id="tx-list" class="divide-y divide-slate-200 dark:divide-slate-700"></ul>
+        <p id="tx-empty" class="hidden px-4 py-10 text-center text-slate-500 dark:text-slate-400"></p>
+      </section>
+    </main>
+  </section>
+
+  <!-- Add / edit form -->
+  <dialog id="tx-dialog" class="w-[calc(100%-2rem)] max-w-md rounded-xl border border-slate-200 bg-white text-slate-900 shadow-xl backdrop:bg-slate-900/60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
+    <form id="tx-form" class="p-6" novalidate>
+      <h2 id="tx-title" class="mb-4 text-lg font-semibold">Add transaction</h2>
+
+      <div class="mb-4 grid grid-cols-2 gap-2" role="radiogroup" aria-label="Type">
+        <label class="cursor-pointer">
+          <input type="radio" name="type" value="expense" class="peer sr-only" checked>
+          <span class="block rounded-lg border border-slate-300 py-2 text-center text-sm font-semibold text-slate-600 peer-checked:border-rose-500 peer-checked:bg-rose-50 peer-checked:text-rose-700 peer-focus-visible:ring-2 peer-focus-visible:ring-indigo-500 dark:border-slate-600 dark:text-slate-300 dark:peer-checked:bg-rose-950 dark:peer-checked:text-rose-300">Expense</span>
+        </label>
+        <label class="cursor-pointer">
+          <input type="radio" name="type" value="income" class="peer sr-only">
+          <span class="block rounded-lg border border-slate-300 py-2 text-center text-sm font-semibold text-slate-600 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 peer-checked:text-emerald-700 peer-focus-visible:ring-2 peer-focus-visible:ring-indigo-500 dark:border-slate-600 dark:text-slate-300 dark:peer-checked:bg-emerald-950 dark:peer-checked:text-emerald-300">Income</span>
+        </label>
+      </div>
+
+      <div class="grid grid-cols-1 gap-x-3 sm:grid-cols-2">
+        <div class="mb-2">
+          <label class="label" for="tx-amount">Amount (KES)</label>
+          <input id="tx-amount" class="field" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
+          <p id="tx-amount-error" class="field-error"></p>
+        </div>
+        <div class="mb-2">
+          <label class="label" for="tx-category">Category</label>
+          <select id="tx-category" class="field"></select>
+          <p id="tx-category-error" class="field-error"></p>
+        </div>
+      </div>
+
+      <div class="mb-2">
+        <label class="label" for="tx-date">Date</label>
+        <input id="tx-date" class="field" type="date">
+        <p id="tx-date-error" class="field-error"></p>
+      </div>
+
+      <div class="mb-2">
+        <label class="label" for="tx-note">Note <span class="font-normal text-slate-500 dark:text-slate-400">(optional)</span></label>
+        <input id="tx-note" class="field" type="text" maxlength="200" placeholder="What was it for?">
+        <p id="tx-note-error" class="field-error"></p>
+      </div>
+
+      <p id="tx-form-error" class="field-error font-semibold" role="alert"></p>
+
+      <div class="mt-2 flex justify-end gap-2">
+        <button id="tx-cancel" type="button" class="btn">Cancel</button>
+        <button id="tx-save" type="submit" class="btn btn-primary">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Delete confirmation -->
+  <dialog id="delete-dialog" class="w-[calc(100%-2rem)] max-w-sm rounded-xl border border-slate-200 bg-white text-slate-900 shadow-xl backdrop:bg-slate-900/60 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
+    <div class="p-6">
+      <h2 class="mb-2 text-lg font-semibold">Delete this transaction?</h2>
+      <p id="delete-text" class="mb-5 text-sm text-slate-600 dark:text-slate-300"></p>
+      <div class="flex justify-end gap-2">
+        <button id="delete-cancel" type="button" class="btn">Cancel</button>
+        <button id="delete-confirm" type="button" class="btn btn-danger">Delete</button>
+      </div>
+    </div>
+  </dialog>
+
+  <div id="toast" role="status" aria-live="polite" class="pointer-events-none fixed bottom-6 left-1/2 z-50 -translate-x-1/2 translate-y-4 rounded-lg bg-slate-900 px-4 py-2 text-sm text-white opacity-0 shadow-lg transition duration-200 motion-reduce:transition-none"></div>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "name": "expense-tracker",
+  "version": "1.0.0",
+  "description": "Expense Tracker: dashboard, REST API, SQLite database and user login. Styled with Tailwind CSS.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node --no-warnings server.js",
+    "dev": "node --no-warnings --watch server.js",
+    "seed": "node --no-warnings scripts/seed.js",
+    "test": "node --no-warnings --test",
+    "build:css": "tailwindcss -i ./src/input.css -o ./public/styles.css --minify",
+    "watch:css": "tailwindcss -i ./src/input.css -o ./public/styles.css --watch"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  },
+  "license": "MIT"
+}
