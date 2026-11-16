@@ -52,6 +52,12 @@ Running the seed command again replaces the demo account's existing transactions
 
 To use another port, set `PORT`, for example `PORT=4000 npm start`.
 
+## Deploy on Render
+
+The repository includes a Render Blueprint in `render.yaml`. To deploy it, create a Render account, choose **New → Blueprint**, connect this GitHub repository, and review the Blueprint before creating its resources. It creates a paid web service and a 1 GB persistent disk; check Render's current pricing before approving.
+
+After the deploy completes, open the `onrender.com` URL shown for the service. The disk keeps the SQLite database across restarts and deploys. The service is configured to use HTTPS cookies and to deploy again when changes are pushed to the connected branch.
+
 ## Features
 
 - Create an account, sign in and log out
